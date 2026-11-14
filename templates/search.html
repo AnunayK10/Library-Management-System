@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Search & Filter Books - Online Library Management System{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-title">🔍 Search & Filter Books</div>
+  <form method="GET" action="{{ url_for('search_books') }}">
+    <div class="grid-3">
+      <div class="form-group">
+        <label for="q">Keyword (Title, ISBN, Author):</label>
+        <input type="text" id="q" name="q" value="{{ query }}" placeholder="Search by title, author, or ISBN...">
+      </div>
+      <div class="form-group">
+        <label for="category">Category Filter:</label>
+        <select id="category" name="category">
+          <option value="All" {% if selected_category == 'All' %}selected{% endif %}>All Categories</option>
+          {% for cat in categories %}
+            <option value="{{ cat }}" {% if selected_category == cat %}selected{% endif %}>{{ cat }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="availability">Availability Filter:</label>
+        <select id="availability" name="availability">
+          <option value="All" {% if selected_avail == 'All' %}selected{% endif %}>All Copies</option>
+          <option value="Available" {% if selected_avail == 'Available' %}selected{% endif %}>Available Only</option>
+          <option value="Unavailable" {% if selected_avail == 'Unavailable' %}selected{% endif %}>Unavailable Only</option>
+        </select>
+      </div>
+    </div>
+    <div style="display: flex; gap: 0.5rem;">
+      <button type="submit" class="btn btn-primary">Search Books</button>
+      <a href="{{ url_for('search_books') }}" class="btn btn-secondary">Reset Filters</a>
+    </div>
+  </form>
+</div>
+
+<div class="card">
+  <div class="card-title">
+    <span>Results ({{ results|length }} books matched)</span>
+  </div>
+
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Title</th>
+          <th>ISBN</th>
+          <th>Category</th>
+          <th>Price</th>
+          <th>Author(s)</th>
+          <th>Publisher</th>
+          <th>Available Copies</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for b in results %}
+        <tr>
+          <td><strong>{{ b.BookID }}</strong></td>
+          <td>{{ b.Title }}</td>
+          <td><code>{{ b.ISBN }}</code></td>
+          <td><span class="badge badge-info">{{ b.Category }}</span></td>
+          <td>₹{{ "%.2f"|format(b.Price) }}</td>
+          <td>{{ b.Authors or 'Unknown' }}</td>
+          <td>{{ b.PublisherName }}</td>
+          <td>
+            {% if b.AvailableCopies > 0 %}
+              <span class="badge badge-success">{{ b.AvailableCopies }} Available</span>
+            {% else %}
+              <span class="badge badge-danger">Borrowed Out</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if b.AvailableCopies > 0 %}
+              <a href="{{ url_for('borrow_book') }}" class="btn btn-primary btn-sm">Borrow</a>
+            {% else %}
+              <span class="badge badge-warning">Unavailable</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="9" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+            No books matched your search criteria. Try different keywords or reset filters.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

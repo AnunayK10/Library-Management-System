@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Return Book - Online Library Management System{% endblock %}
+
+{% block content %}
+<div class="grid-2">
+  <div class="card">
+    <div class="card-title">📥 Return Book Transaction</div>
+    <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+      Select an active loan to record return. If returned past the due date, an overdue fine is automatically calculated and assigned to the selected librarian.
+    </p>
+
+    <form method="POST" action="{{ url_for('return_book') }}">
+      <div class="form-group">
+        <label for="loan_id">Select Active Loan:</label>
+        <select id="loan_id" name="loan_id" required>
+          {% for l in active_loans %}
+            <option value="{{ l.LoanID }}">
+              Loan #{{ l.LoanID }}: {{ l.MemberName }} - "{{ l.BookTitle }}" [Due: {{ l.DueDate }}]
+            </option>
+          {% else %}
+            <option disabled>No active loans in circulation</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="return_date">Return Date:</label>
+        <input type="date" id="return_date" name="return_date" value="{{ today }}" required>
+      </div>
+
+      <div class="form-group">
+        <label for="librarian_id">Managing Librarian:</label>
+        <select id="librarian_id" name="librarian_id" required>
+          {% for lib in librarians %}
+            <option value="{{ lib.LibrarianID }}">{{ lib.Name }} (ID: {{ lib.LibrarianID }})</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn-success" {% if not active_loans %}disabled{% endif %}>
+        Process Book Return
+      </button>
+    </form>
+  </div>
+
+  <div class="card">
+    <div class="card-title">⚖️ Return & Fine Policy</div>
+    <ul style="padding-left: 1.25rem; font-size: 0.92rem; color: #334155; line-height: 1.8;">
+      <li>Returning a copy resets its status back to <strong>Available</strong>.</li>
+      <li>Late returns trigger automatic creation of a <strong>FINE</strong> entity record.</li>
+      <li>Fine Rate: <strong>₹5.00 per day</strong> overdue beyond the scheduled DueDate.</li>
+      <li>As specified in the ER diagram, fines are managed and recorded under a <strong>LIBRARIAN</strong> (relationship: <code>LIBRARIAN MANAGES FINE</code>).</li>
+    </ul>
+
+    <div style="margin-top: 1.5rem; padding: 1rem; background: #fffbeb; border-radius: 6px; border: 1px solid #fde68a;">
+      <strong>Current Active Loans in Circulation:</strong> {{ active_loans|length }} books currently borrowed.
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">📋 Active Loans Currently Awaiting Return</div>
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>Loan ID</th>
+          <th>Member Name</th>
+          <th>Book Title</th>
+          <th>Barcode</th>
+          <th>Issue Date</th>
+          <th>Due Date</th>
+          <th>Overdue Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for l in active_loans %}
+        <tr>
+          <td><strong>#{{ l.LoanID }}</strong></td>
+          <td>{{ l.MemberName }}</td>
+          <td>{{ l.BookTitle }}</td>
+          <td><code>{{ l.Barcode }}</code></td>
+          <td>{{ l.IssueDate }}</td>
+          <td>{{ l.DueDate }}</td>
+          <td>
+            {% if l.DueDate < today %}
+              <span class="badge badge-danger">OVERDUE</span>
+            {% else %}
+              <span class="badge badge-success">On Schedule</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="7" style="text-align: center; color: var(--text-muted);">All loaned books have been returned!</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

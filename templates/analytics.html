@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Reports & Visualizations - Online Library Management System{% endblock %}
+
+{% block head %}
+<!-- Plotly CDN for rich interactive dashboard -->
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="card" style="background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); color: white; border: none;">
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+    <div>
+      <h2 style="font-size: 1.4rem; font-weight: 700; margin-bottom: 0.25rem;">📊 Academic Data Analytics & Statistical Reports</h2>
+      <p style="color: #cbd5e1; font-size: 0.9rem;">
+        Powered by <strong>Python, Pandas, NumPy, Matplotlib, Seaborn, and Plotly</strong> for curriculum requirements.
+      </p>
+    </div>
+    <div style="margin-top: 0.5rem;">
+      <a href="{{ url_for('static', filename='interactive_dashboard.html') }}" target="_blank" class="btn btn-secondary btn-sm" style="background: white; color: #1e3a8a;">
+        🔗 Open Standalone Plotly Dashboard
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Numerical Summaries (NumPy & Pandas) -->
+<div class="grid-4" style="margin-bottom: 1.5rem;">
+  <div class="stat-box">
+    <div class="stat-val">{{ stats.total_books }}</div>
+    <div class="stat-label">Total Titles</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-val">{{ stats.total_copies }}</div>
+    <div class="stat-label">Total Copies ({{ stats.available_copies }} Avail)</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-val" style="color: var(--warning);">{{ stats.active_loans }}</div>
+    <div class="stat-label">Active Loans ({{ stats.overdue_loans }} Overdue)</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-val" style="color: var(--primary);">₹{{ stats.price_stats.mean }}</div>
+    <div class="stat-label">Mean Book Price (Std: ₹{{ stats.price_stats.std }})</div>
+  </div>
+</div>
+
+<!-- Interactive Plotly Visualizations -->
+<div class="card">
+  <div class="card-title">🌐 Interactive Visualizations (Plotly)</div>
+  <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1rem;">
+    Hover, zoom, and inspect data points across the 4 core dimensions: Categories, Resource Utilization, Borrowing Trends, and Fines.
+  </p>
+  <div style="width: 100%; min-height: 700px;">
+    {{ plotly_html | safe }}
+  </div>
+</div>
+
+<div class="grid-2">
+  <!-- Category Breakdown (Pandas GroupBy) -->
+  <div class="card">
+    <div class="card-title">📚 Category Breakdown (Pandas Aggregations)</div>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Titles</th>
+            <th>Copies</th>
+            <th>Avg Price</th>
+            <th>Price Range</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for cat in cat_summary %}
+          <tr>
+            <td><strong>{{ cat.Category }}</strong></td>
+            <td>{{ cat.BookCount }}</td>
+            <td>{{ cat.TotalCopies }}</td>
+            <td>₹{{ "%.2f"|format(cat.AvgPrice) }}</td>
+            <td>₹{{ "%.0f"|format(cat.MinPrice) }} - ₹{{ "%.0f"|format(cat.MaxPrice) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Frequently Borrowed Books -->
+  <div class="card">
+    <div class="card-title">🔥 Frequently Borrowed Books (Top 5)</div>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Book Title</th>
+            <th>Category</th>
+            <th>Borrow Count</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for b in top_borrowed %}
+          <tr>
+            <td><strong>{{ b.BookTitle }}</strong></td>
+            <td><span class="badge badge-info">{{ b.Category }}</span></td>
+            <td><span class="badge badge-success">{{ b.BorrowCount }} loans</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top: 1.25rem; padding: 0.75rem; background: #f8fafc; border-radius: 6px; border: 1px solid var(--border-color); font-size: 0.88rem;">
+      <strong>Loan Duration Pattern:</strong> Average loan length: <strong>{{ duration_stats.avg_days }} days</strong> (Min: {{ duration_stats.min_days }} days, Max: {{ duration_stats.max_days }} days).
+    </div>
+  </div>
+</div>
+
+<!-- Static Matplotlib & Seaborn Report Figure -->
+<div class="card">
+  <div class="card-title">📈 Static Export Dashboard (Matplotlib & Seaborn)</div>
+  <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1rem;">
+    High-resolution figure rendered using <code>seaborn.set_theme()</code> and <code>matplotlib.pyplot</code> for project report documentation.
+  </p>
+  <div style="text-align: center;">
+    <img src="{{ url_for('static', filename='analytics_chart.png') }}" alt="Library Analytics Dashboard" style="max-width: 100%; height: auto; border-radius: 6px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+  </div>
+</div>
+{% endblock %}

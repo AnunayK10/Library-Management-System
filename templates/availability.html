@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Book Availability - Online Library Management System{% endblock %}
+
+{% block content %}
+<div class="grid-4" style="margin-bottom: 1.5rem;">
+  <div class="stat-box">
+    <div class="stat-val">{{ stats.total_copies }}</div>
+    <div class="stat-label">Total Copies</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-val" style="color: var(--success);">{{ stats.available_copies }}</div>
+    <div class="stat-label">Available Copies</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-val" style="color: var(--danger);">{{ stats.borrowed_copies }}</div>
+    <div class="stat-label">Borrowed Copies</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-val" style="color: var(--primary);">{{ stats.utilization_rate }}%</div>
+    <div class="stat-label">Utilization Rate</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">
+    <span>🏷️ Real-Time Copy Inventory & Shelf Tracking</span>
+  </div>
+
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>Copy ID</th>
+          <th>Book Title</th>
+          <th>Category</th>
+          <th>Barcode</th>
+          <th>Shelf No</th>
+          <th>Responsible Librarian (Placed On)</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in copies %}
+        <tr>
+          <td><strong>#{{ c.CopyID }}</strong></td>
+          <td>{{ c.BookTitle }}</td>
+          <td><span class="badge badge-info">{{ c.Category }}</span></td>
+          <td><code>{{ c.Barcode }}</code></td>
+          <td><strong>{{ c.ShelfNo }}</strong></td>
+          <td>{{ c.LibrarianName or 'Unassigned' }}</td>
+          <td>
+            {% if c.Status == 'Available' %}
+              <span class="badge badge-success">Available</span>
+            {% elif c.Status == 'Borrowed' %}
+              <span class="badge badge-danger">Borrowed</span>
+            {% elif c.Status == 'Maintenance' %}
+              <span class="badge badge-warning">Maintenance</span>
+            {% else %}
+              <span class="badge badge-info">{{ c.Status }}</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

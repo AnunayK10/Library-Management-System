@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Librarians - Online Library Management System{% endblock %}
+
+{% block content %}
+<div class="grid-2">
+  <div class="card">
+    <div class="card-title">
+      <span>👩‍💼 Librarian Staff Records</span>
+    </div>
+
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Email</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for lib in librarians %}
+          <tr>
+            <td><strong>#{{ lib.LibrarianID }}</strong></td>
+            <td><strong>{{ lib.Name }}</strong></td>
+            <td>{{ lib.Phone }}</td>
+            <td>{{ lib.Email }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+      <h3 style="font-size: 1rem; color: var(--primary); margin-bottom: 0.75rem;">➕ Add New Librarian</h3>
+      <form method="POST" action="{{ url_for('add_librarian_route') }}">
+        <div class="form-group">
+          <label for="name">Staff Name:</label>
+          <input type="text" id="name" name="name" required placeholder="e.g. Dr. Ramesh Gupta">
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="phone">Phone:</label>
+            <input type="text" id="phone" name="phone" required placeholder="e.g. +91-9811002233">
+          </div>
+          <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="text" id="email" name="email" required placeholder="e.g. rgupta@library.org">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm">Save Librarian</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      <span>📍 Assign Copy Placement (PLACED_ON Relationship)</span>
+    </div>
+    <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1rem;">
+      In accordance with the ER diagram relationship <code>COPY -- PLACED_ON -- LIBRARIAN</code>, each physical copy is placed on a designated shelf under the responsibility of a Librarian.
+    </p>
+
+    <form method="POST" action="{{ url_for('update_copy_placement_route') }}">
+      <div class="form-group">
+        <label for="copy_id">Select Copy:</label>
+        <select id="copy_id" name="copy_id" required>
+          {% for c in copies %}
+            <option value="{{ c.CopyID }}">Copy #{{ c.CopyID }}: {{ c.BookTitle }} [{{ c.Barcode }}] (Now: {{ c.ShelfNo }})</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="shelf_no">Designated Shelf Number:</label>
+        <input type="text" id="shelf_no" name="shelf_no" required placeholder="e.g. Shelf-A1, Shelf-B2">
+      </div>
+
+      <div class="form-group">
+        <label for="librarian_id">Assigned Librarian:</label>
+        <select id="librarian_id" name="librarian_id" required>
+          {% for lib in librarians %}
+            <option value="{{ lib.LibrarianID }}">{{ lib.Name }} (ID: {{ lib.LibrarianID }})</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Update Shelf Placement</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

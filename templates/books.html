@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Books - Online Library Management System{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-title">
+    <span>📚 Library Book Records</span>
+    <button class="btn btn-primary btn-sm" onclick="document.getElementById('add-book-section').scrollIntoView({behavior: 'smooth'})">
+      ➕ Add New Book
+    </button>
+  </div>
+
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Title</th>
+          <th>ISBN</th>
+          <th>Category</th>
+          <th>Price</th>
+          <th>Year</th>
+          <th>Publisher</th>
+          <th>Author(s)</th>
+          <th>Total Copies</th>
+          <th>Available</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for b in books %}
+        <tr>
+          <td><strong>{{ b.BookID }}</strong></td>
+          <td>{{ b.Title }}</td>
+          <td><code>{{ b.ISBN }}</code></td>
+          <td><span class="badge badge-info">{{ b.Category }}</span></td>
+          <td>₹{{ "%.2f"|format(b.Price) }}</td>
+          <td>{{ b.PublishYear }}</td>
+          <td>{{ b.PublisherName }}</td>
+          <td>{{ b.Authors or 'Not Specified' }}</td>
+          <td style="text-align: center;">{{ b.TotalCopies }}</td>
+          <td style="text-align: center;">
+            {% if b.AvailableCopies > 0 %}
+              <span class="badge badge-success">{{ b.AvailableCopies }} Avail</span>
+            {% else %}
+              <span class="badge badge-danger">0 Avail</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="10" style="text-align: center;">No books found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card" id="add-book-section">
+  <div class="card-title">➕ Add New Book Record</div>
+  <form method="POST" action="{{ url_for('add_book_route') }}">
+    <div class="grid-2">
+      <div class="form-group">
+        <label for="title">Book Title:</label>
+        <input type="text" id="title" name="title" required placeholder="e.g. Computer Networks">
+      </div>
+      <div class="form-group">
+        <label for="isbn">ISBN:</label>
+        <input type="text" id="isbn" name="isbn" required placeholder="e.g. 978-0132126953">
+      </div>
+    </div>
+
+    <div class="grid-3">
+      <div class="form-group">
+        <label for="category">Category:</label>
+        <input type="text" id="category" name="category" required placeholder="e.g. Networking">
+      </div>
+      <div class="form-group">
+        <label for="price">Price (₹):</label>
+        <input type="number" step="0.01" id="price" name="price" required placeholder="e.g. 850.00">
+      </div>
+      <div class="form-group">
+        <label for="publish_year">Publish Year:</label>
+        <input type="number" id="publish_year" name="publish_year" required value="2024">
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="form-group">
+        <label for="publisher_id">Publisher:</label>
+        <select id="publisher_id" name="publisher_id" required>
+          {% for p in publishers %}
+            <option value="{{ p.PublisherID }}">{{ p.PublisherName }} (ID: {{ p.PublisherID }})</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="author_id">Primary Author:</label>
+        <select id="author_id" name="author_id" required>
+          {% for a in authors %}
+            <option value="{{ a.AuthorID }}">{{ a.AuthorName }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-success">Save Book Record</button>
+  </form>
+</div>
+{% endblock %}

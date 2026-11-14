@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Online Library Management System{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <header>
+    <div class="top-bar">
+      <div>
+        <h1>📖 ONLINE LIBRARY MANAGEMENT SYSTEM</h1>
+        <div class="project-sub">MCA Capstone Project (CMCA0303) | Software Engineering</div>
+      </div>
+      <div>
+        <span style="font-size: 0.85rem; background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 4px;">
+          SDG 4: Quality Education
+        </span>
+      </div>
+    </div>
+    <nav>
+      <a href="{{ url_for('view_books') }}" class="{% if request.endpoint == 'view_books' %}active{% endif %}">Books</a>
+      <a href="{{ url_for('search_books') }}" class="{% if request.endpoint == 'search_books' %}active{% endif %}">Search & Filter</a>
+      <a href="{{ url_for('borrow_book') }}" class="{% if request.endpoint == 'borrow_book' %}active{% endif %}">Borrow</a>
+      <a href="{{ url_for('return_book') }}" class="{% if request.endpoint == 'return_book' %}active{% endif %}">Return</a>
+      <a href="{{ url_for('view_members') }}" class="{% if request.endpoint in ['view_members', 'member_history'] %}active{% endif %}">Members</a>
+      <a href="{{ url_for('view_availability') }}" class="{% if request.endpoint == 'view_availability' %}active{% endif %}">Availability</a>
+      <a href="{{ url_for('view_librarians') }}" class="{% if request.endpoint == 'view_librarians' %}active{% endif %}">Librarians</a>
+      <a href="{{ url_for('view_loans') }}" class="{% if request.endpoint == 'view_loans' %}active{% endif %}">Loans</a>
+      <a href="{{ url_for('view_fines') }}" class="{% if request.endpoint == 'view_fines' %}active{% endif %}">Fines</a>
+      <a href="{{ url_for('view_analytics') }}" class="{% if request.endpoint == 'view_analytics' %}active{% endif %}">Reports & Visualizations</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer>
+    <p>Online Library Management System | MCA Capstone Project | Developed strictly according to ER Diagram & PBL Specifications</p>
+  </footer>
+</body>
+</html>

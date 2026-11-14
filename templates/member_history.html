@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Borrowing History - {{ member.Name }}{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-title">
+    <span>📜 Borrowing History: {{ member.Name }} (Member ID: #{{ member.MemberID }})</span>
+    <a href="{{ url_for('view_members') }}" class="btn btn-secondary btn-sm">⬅️ Back to Members</a>
+  </div>
+
+  <div style="margin-bottom: 1rem; color: #475569; font-size: 0.92rem;">
+    <strong>Email:</strong> {{ member.Email }} | <strong>Phone:</strong> {{ member.Phone }} | <strong>Address:</strong> {{ member.Address }} | <strong>Member Since:</strong> {{ member.JoinDate }}
+  </div>
+
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>Loan ID</th>
+          <th>Book Title</th>
+          <th>Category</th>
+          <th>Barcode</th>
+          <th>Shelf</th>
+          <th>Issue Date</th>
+          <th>Due Date</th>
+          <th>Return Date</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for h in history %}
+        <tr>
+          <td><strong>#{{ h.LoanID }}</strong></td>
+          <td>{{ h.BookTitle }}</td>
+          <td><span class="badge badge-info">{{ h.Category }}</span></td>
+          <td><code>{{ h.Barcode }}</code></td>
+          <td>{{ h.ShelfNo }}</td>
+          <td>{{ h.IssueDate }}</td>
+          <td>{{ h.DueDate }}</td>
+          <td>{{ h.ReturnDate or '-' }}</td>
+          <td>
+            {% if h.ReturnDate %}
+              <span class="badge badge-success">Returned</span>
+            {% else %}
+              <span class="badge badge-warning">Active Borrowing</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="9" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+            No borrowing transactions found for this member.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

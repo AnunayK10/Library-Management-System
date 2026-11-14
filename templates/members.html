@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Members - Online Library Management System{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-title">
+    <span>👤 Member Records</span>
+    <button class="btn btn-primary btn-sm" onclick="document.getElementById('register-member-sec').scrollIntoView({behavior: 'smooth'})">
+      ➕ Register New Member
+    </button>
+  </div>
+
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Address</th>
+          <th>Phone</th>
+          <th>Email</th>
+          <th>Join Date</th>
+          <th>Total Loans</th>
+          <th>Active Loans</th>
+          <th>History</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in members %}
+        <tr>
+          <td><strong>#{{ m.MemberID }}</strong></td>
+          <td>{{ m.Name }}</td>
+          <td>{{ m.Address }}</td>
+          <td>{{ m.Phone }}</td>
+          <td>{{ m.Email }}</td>
+          <td>{{ m.JoinDate }}</td>
+          <td style="text-align: center;">{{ m.TotalLoans }}</td>
+          <td style="text-align: center;">
+            {% if m.ActiveLoans > 0 %}
+              <span class="badge badge-warning">{{ m.ActiveLoans }} active</span>
+            {% else %}
+              <span class="badge badge-success">0 active</span>
+            {% endif %}
+          </td>
+          <td>
+            <a href="{{ url_for('member_history', member_id=m.MemberID) }}" class="btn btn-secondary btn-sm">
+              View History
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card" id="register-member-sec">
+  <div class="card-title">➕ Register New Member</div>
+  <form method="POST" action="{{ url_for('add_member_route') }}">
+    <div class="grid-2">
+      <div class="form-group">
+        <label for="name">Full Name:</label>
+        <input type="text" id="name" name="name" required placeholder="e.g. Ramesh Kumar">
+      </div>
+      <div class="form-group">
+        <label for="email">Email Address:</label>
+        <input type="text" id="email" name="email" required placeholder="e.g. ramesh.kumar@student.org">
+      </div>
+    </div>
+
+    <div class="grid-3">
+      <div class="form-group">
+        <label for="phone">Phone Number:</label>
+        <input type="text" id="phone" name="phone" required placeholder="e.g. +91-9876543210">
+      </div>
+      <div class="form-group">
+        <label for="address">Address / Dept / Room:</label>
+        <input type="text" id="address" name="address" required placeholder="e.g. MCA Dept, Block A">
+      </div>
+      <div class="form-group">
+        <label for="join_date">Join Date:</label>
+        <input type="date" id="join_date" name="join_date" value="{{ today }}" required>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Member Registration</button>
+  </form>
+</div>
+{% endblock %}

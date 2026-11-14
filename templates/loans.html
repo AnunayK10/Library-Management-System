@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Loan Records - Online Library Management System{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-title">
+    <span>📋 Complete Loan Transaction Records</span>
+    <div>
+      <a href="{{ url_for('view_loans', filter='All') }}" class="btn btn-sm {% if current_filter == 'All' %}btn-primary{% else %}btn-secondary{% endif %}">All Loans</a>
+      <a href="{{ url_for('view_loans', filter='Active') }}" class="btn btn-sm {% if current_filter == 'Active' %}btn-primary{% else %}btn-secondary{% endif %}">Active Loans</a>
+      <a href="{{ url_for('view_loans', filter='Returned') }}" class="btn btn-sm {% if current_filter == 'Returned' %}btn-primary{% else %}btn-secondary{% endif %}">Returned Loans</a>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>Loan ID</th>
+          <th>Borrower (Member)</th>
+          <th>Book Title</th>
+          <th>Copy Barcode</th>
+          <th>Shelf</th>
+          <th>Issue Date</th>
+          <th>Due Date</th>
+          <th>Return Date</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for l in loans %}
+        <tr>
+          <td><strong>#{{ l.LoanID }}</strong></td>
+          <td>{{ l.MemberName }}</td>
+          <td>{{ l.BookTitle }}</td>
+          <td><code>{{ l.Barcode }}</code></td>
+          <td>{{ l.ShelfNo }}</td>
+          <td>{{ l.IssueDate }}</td>
+          <td>{{ l.DueDate }}</td>
+          <td>{{ l.ReturnDate or '-' }}</td>
+          <td>
+            {% if l.ReturnDate %}
+              <span class="badge badge-success">Returned</span>
+            {% elif l.DueDate < today %}
+              <span class="badge badge-danger">OVERDUE</span>
+            {% else %}
+              <span class="badge badge-warning">Active</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="9" style="text-align: center; color: var(--text-muted); padding: 2rem;">No loan records found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

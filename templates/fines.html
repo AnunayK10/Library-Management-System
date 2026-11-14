@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Fine Records - Online Library Management System{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-title">
+    <span>💰 Fine Records (Managed by Librarian)</span>
+    <div>
+      <a href="{{ url_for('view_fines', filter='All') }}" class="btn btn-sm {% if current_filter == 'All' %}btn-primary{% else %}btn-secondary{% endif %}">All Fines</a>
+      <a href="{{ url_for('view_fines', filter='Unpaid') }}" class="btn btn-sm {% if current_filter == 'Unpaid' %}btn-primary{% else %}btn-secondary{% endif %}">Unpaid Fines</a>
+      <a href="{{ url_for('view_fines', filter='Paid') }}" class="btn btn-sm {% if current_filter == 'Paid' %}btn-primary{% else %}btn-secondary{% endif %}">Paid Fines</a>
+    </div>
+  </div>
+
+  <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1rem;">
+    Strictly aligns with the ER Diagram: <code>LIBRARIAN -- MANAGES -- FINE</code>. Attributes: FineID, MemberID (FK), LoanID (FK), LibrarianID, FineAmount, PaidStatus, PaidDate.
+  </p>
+
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>Fine ID</th>
+          <th>Member Name</th>
+          <th>Book Title</th>
+          <th>Due Date</th>
+          <th>Return Date</th>
+          <th>Fine Amount</th>
+          <th>Status</th>
+          <th>Paid Date</th>
+          <th>Managing Librarian</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for f in fines %}
+        <tr>
+          <td><strong>#{{ f.FineID }}</strong></td>
+          <td>{{ f.MemberName }}</td>
+          <td>{{ f.BookTitle }}</td>
+          <td>{{ f.DueDate }}</td>
+          <td>{{ f.ReturnDate or '-' }}</td>
+          <td><strong>₹{{ "%.2f"|format(f.FineAmount) }}</strong></td>
+          <td>
+            {% if f.PaidStatus == 'Paid' %}
+              <span class="badge badge-success">Paid</span>
+            {% else %}
+              <span class="badge badge-danger">Unpaid</span>
+            {% endif %}
+          </td>
+          <td>{{ f.PaidDate or '-' }}</td>
+          <td>{{ f.LibrarianName }}</td>
+          <td>
+            {% if f.PaidStatus == 'Unpaid' %}
+              <form method="POST" action="{{ url_for('pay_fine_route') }}" style="display: inline;">
+                <input type="hidden" name="fine_id" value="{{ f.FineID }}">
+                <select name="librarian_id" required style="width: auto; padding: 2px 4px; font-size: 0.8rem;">
+                  {% for lib in librarians %}
+                    <option value="{{ lib.LibrarianID }}">{{ lib.Name }}</option>
+                  {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-success btn-sm">Mark Paid</button>
+              </form>
+            {% else %}
+              <span style="color: var(--success); font-size: 0.85rem; font-weight: 600;">Settled</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="10" style="text-align: center; color: var(--text-muted); padding: 2rem;">No fine records found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

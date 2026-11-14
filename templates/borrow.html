@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Borrow Book - Online Library Management System{% endblock %}
+
+{% block content %}
+<div class="grid-2">
+  <div class="card">
+    <div class="card-title">📤 Issue / Borrow Book</div>
+    <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+      Record a new loan transaction connecting a registered Member and an available Copy.
+    </p>
+
+    <form method="POST" action="{{ url_for('borrow_book') }}">
+      <div class="form-group">
+        <label for="member_id">Select Member:</label>
+        <select id="member_id" name="member_id" required>
+          {% for m in members %}
+            <option value="{{ m.MemberID }}">{{ m.Name }} (ID: {{ m.MemberID }} | {{ m.Email }})</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="copy_id">Select Available Copy:</label>
+        <select id="copy_id" name="copy_id" required>
+          {% for c in available_copies %}
+            <option value="{{ c.CopyID }}">{{ c.Title }} [Barcode: {{ c.Barcode }} | Shelf: {{ c.ShelfNo }}]</option>
+          {% else %}
+            <option disabled>No copies currently available for loan</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label for="issue_date">Issue Date:</label>
+          <input type="date" id="issue_date" name="issue_date" value="{{ today }}" required>
+        </div>
+        <div class="form-group">
+          <label for="due_date">Due Date:</label>
+          <input type="date" id="due_date" name="due_date" value="{{ default_due }}" required>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary" {% if not available_copies %}disabled{% endif %}>
+        Confirm Borrowing Transaction
+      </button>
+    </form>
+  </div>
+
+  <div class="card">
+    <div class="card-title">ℹ️ Borrowing Rules & Guidelines</div>
+    <ul style="padding-left: 1.25rem; font-size: 0.92rem; color: #334155; line-height: 1.8;">
+      <li>Only copies with status <strong>Available</strong> can be borrowed.</li>
+      <li>Standard loan duration is <strong>14 days</strong> from the date of issue.</li>
+      <li>Upon issuance, the copy status transitions to <strong>Borrowed</strong> automatically.</li>
+      <li>Overdue returns are subject to a late fine managed by the librarian.</li>
+      <li>Borrowing records are mapped to the <strong>LOAN</strong> entity in accordance with the ER diagram.</li>
+    </ul>
+
+    <div style="margin-top: 1.5rem; padding: 1rem; background: #eff6ff; border-radius: 6px; border: 1px solid #bfdbfe;">
+      <strong>Active Available Inventory:</strong> {{ available_copies|length }} book copies ready for immediate borrowing.
+    </div>
+  </div>
+</div>
+{% endblock %}
